@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库查询助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e9ecef;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .container {
+            width: 90%;
+            height: 90%;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 2px solid #007bff;
+        }
+        .database-select {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+        }
+        .database-select label {
+            margin-right: 10px;
+        }
+        .database-select select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .recommendations {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 2px solid #007bff;
+        }
+        .input-area textarea {
+            width: 100%;
+            height: 60px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            resize: none;
+            font-size: 16px;
+        }
+        .input-area button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        .input-area button:hover {
+            background-color: #0056b3;
+        }
+        .output-container {
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 10px); /* 占满剩余空间 */
+        }
+
+        .output-tabs {
+            display: flex;
+            margin-bottom: 0; /* 移除底部边距 */
+        }
+
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 5px 5px 0 0;
+            background-color: #f9f9f9;
+            margin-right: 5px;
+        }
+
+        .tab.active {
+            background-color: #fff;
+            border-bottom: none;
+        }
+
+        .output-content {
+            display: none; /* 默认隐藏 */
+            flex-grow: 1; /* 占满剩余空间 */
+            padding: 10px; /* 内边距 */
+            background-color: #fff; /* 背景颜色 */
+            border-radius: 5px; /* 圆角 */
+            overflow-y: auto; /* 允许垂直滚动 */
+            max-height: 580px; /* 设置最大高度 */
+        }
+
+        .output-content.active {
+            display: block; /* 只显示活动内容 */
+        }
+
+
+        pre {
+            background-color: transparent; /* 背景颜色透明 */
+            border: none; /* 去掉边框 */
+            overflow: auto; /* 允许滚动 */
+            white-space: pre-wrap; /* 保持空格和换行 */
+            font-size: 20px; /* 增加字体大小 */
+            line-height: 1.5; /* 增加行高 */
+        }
+
+        #sqlOutput {
+            background-color: rgba(0, 0, 0, 0.74); /* 设置背景颜色为深色 */
+            color: white; /* 确保文本颜色为白色 */
+            font-weight: bold; /* 设置字体为粗体 */
+        }
+
+        #sqlCodeOutput {
+            font-family: 'Anton', sans-serif; /* 使用 Google Fonts 中的 Roboto 字体 */
+            color: white; /* 设置字体颜色为白色 */
+            font-weight: 900; /* 设置字体为非常粗 */
+            font-size: 24px; /* 增加字体大小 */
+            white-space: pre-wrap; /* 保持空格和换行 */
+        }
+
+
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh;
+            max-height: 90vh;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .scrollable-table {
+            max-height: calc(90vh - 100px);
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* History styles */
+        #history {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .history-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-title {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .history-content {
+            margin-top: 5px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="database-select">
+            <label for="database">数据库选择:</label>
+            <select id="database" onchange="getTables()">
+
+            </select>
+        </div>
+        <div class="button-group">
+            <button class="button" id="detailsButton">数据库详情</button>
+            <button class="button" id="historyButton" onclick="fetchUserInputs()">查看历史</button>
+        </div>
+    </header>
+
+    <div class="recommendations" id="recommendations">
+        <h3>推荐问题:</h3>
+        <p>本周的信息统计有多少？需要哪些重要指标？</p>
+        <p>今天有多少新客户？有多少重要客户？</p>
+        <p>同样的客户有多少交互记录？有多少重要的详情？</p>
+    </div>
+
+
+    <div class="output-container" id="outputContainer">
+        <div class="output-tabs">
+            <div class="tab active" id="sqlTab">SQL</div>
+            <div class="tab" id="resultTab">结果</div>
+        </div>
+        <div class="output-content active" id="sqlOutput">
+            <pre><code id="sqlCodeOutput"></code></pre>
+        </div>
+        <div class="output-content" id="resultOutput">
+            <!-- 查询结果将显示在这里 -->
+        </div>
+    </div>
+
+    <div class="input-area">
+        <textarea id="userQuestion" placeholder="请输入您的问题..."></textarea>
+        <button id="askModelButton">发送</button>
+    </div>
+</div>
+
+<!-- Modal for Database Details -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeDetails" onclick="closeDetailsModal()">&times;</span>
+        <h2>数据库详情</h2>
+        <div>
+            <label for="tableSelectDropdown">选择表:</label>
+            <select id="tableSelectDropdown" onchange="getDatabaseDetails()"></select>
+        </div>
+        <div class="scrollable-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>字段名</th>
+                        <th>数据类型</th>
+                        <th>注释</th>
+                    </tr>
+                </thead>
+                <tbody id="detailsBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for History -->
+<div id="historyModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeHistory" onclick="closeHistoryModal()">&times;</span>
+        <h2>历史记录</h2>
+        <div id="history"></div>
+    </div>
+</div>
+<script src = 'api.js'></script>
+
+</body>
+</html>
+

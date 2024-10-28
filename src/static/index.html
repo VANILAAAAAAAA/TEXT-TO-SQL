@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大模型对话助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e9ecef;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .container {
+            width: 90%;
+            height: 90%;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 2px solid #007bff;
+        }
+        /* 下拉容器样式 */
+        .dropdown-container {
+            display: inline-block; /* 确保下拉菜单在同一行显示 */
+        }
+
+        /* 下拉菜单样式 */
+        .dropdown {
+            position: relative;
+            display: inline-block; /* 确保下拉菜单在同一行显示 */
+        }
+
+        /* 按钮样式 */
+        .dropdown > .dropbtn {
+            padding: 10px 15px; /* 调整内边距 */
+            border-radius: 5px;
+            border: 1px solid #007bff; /* 边框颜色 */
+            font-size: 16px; /* 字号 */
+            font-family: Arial, sans-serif; /* 字体 */
+            cursor: pointer;
+            background-color: #ffffff; /* 背景颜色 */
+            color: #007bff; /* 字体颜色 */
+            transition: background-color 0.3s, border-color 0.3s; /* 添加过渡效果 */
+        }
+
+        /* 按钮悬停效果 */
+        .dropdown > .dropbtn:hover {
+            background-color: #e7f1ff; /* 悬停时背景颜色 */
+            border-color: #0056b3; /* 悬停时边框颜色 */
+        }
+
+        /* 下拉内容样式 */
+        .dropdown-content {
+            display: none; /* 默认隐藏下拉内容 */
+            position: absolute;
+            background-color: #ffffff; /* 下拉菜单背景颜色 */
+            min-width: 160px; /* 下拉菜单最小宽度 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+            z-index: 1;
+            border-radius: 5px; /* 添加圆角 */
+        }
+
+        /* 下拉菜单项样式 */
+        .dropdown-content a {
+            color: #333; /* 链接颜色 */
+            padding: 10px 15px; /* 内边距 */
+            text-decoration: none; /* 去掉下划线 */
+            display: block; /* 块级显示 */
+            transition: background-color 0.3s; /* 添加过渡效果 */
+        }
+
+        /* 下拉菜单项悬停效果 */
+        .dropdown-content a:hover {
+            background-color: #f1f1f1; /* 悬停时背景颜色 */
+        }
+
+
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .recommendations {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            overflow: hidden; /* 隐藏溢出的内容 */
+        }
+
+        #recommendation-list {
+            display: flex;
+            flex-direction: row; /* 水平排列 */
+        }
+
+        .recommendation-item {
+            cursor: pointer; /* 鼠标悬停时显示为手型 */
+            padding: 15px 20px; /* 内边距 */
+            border-radius: 5px; /* 边角圆滑 */
+            background: linear-gradient(135deg, #007bff, #00aaff); /* 蓝色渐变背景 */
+            color: white; /* 字体颜色 */
+            transition: background-color 0.3s, transform 0.3s; /* 背景颜色和缩放过渡效果 */
+            min-width: 200px; /* 设置气泡的最小宽度 */
+            margin-right: 10px; /* 气泡之间的间距 */
+            text-align: center; /* 文本居中 */
+        }
+
+        .recommendation-item:hover {
+            background: linear-gradient(135deg, #0056b3, #0088cc); /* 悬停时的渐变背景 */
+            transform: scale(1.05); /* 悬停时放大效果 */
+        }
+
+        .recommendation-item.selected {
+            color: white; /* 选中时的字体颜色 */
+            text-decoration: underline; /* 选中时添加下划线 */
+        }
+
+
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            transition: height 0.3s; /* 添加过渡效果 */
+        }
+        .input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 2px solid #007bff;
+        }
+        .input-area textarea {
+            width: 100%;
+            height: 30px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            resize: none;
+            font-size: 16px;
+        }
+        .input-area button {
+            padding: 15px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        .input-area button:hover {
+            background-color: #0056b3;
+        }
+        /* Modal styles */
+        .modal {
+            display: none; /* 隐藏模态框 */
+            position: fixed; /* 固定位置 */
+            z-index: 1; /* 在最上层 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 全屏 */
+            height: 100%; /* 全屏 */
+            overflow: auto; /* 启用滚动 */
+            background-color: rgba(0, 0, 0, 0.4); /* 背景透明度 */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; /* 在屏幕中间 */
+            padding: 0; /* 不再有内边距 */
+            width: 70%; /* 调整宽度为 70% */
+            max-height: 85%; /* 最大高度 */
+            border-radius: 15px; /* 添加圆角 */
+            overflow: hidden; /* 隐藏超出的内容 */
+        }
+        .table-container {
+            width: 100%; /* 确保容器占满宽度 */
+            height: calc(100% - 20px); /* 设置高度，减去关闭按钮的高度 */
+            overflow-y: auto; /* 启用纵向滚动 */
+            padding: 10px; /* 添加内边距，确保表格与容器边缘有距离 */
+            box-sizing: border-box; /* 确保内边距包含在宽度和高度计算中 */
+        }
+        table {
+            width: 95%; /* 确保表格占满容器 */
+            border-collapse: collapse; /* 合并边框 */
+            margin: auto;
+        }
+        th, td {
+            border: 1px solid #ddd; /* 边框样式 */
+            padding: 8px; /* 内边距 */
+            text-align: left; /* 左对齐 */
+        }
+        th {
+            background-color: #f2f2f2; /* 表头背景色 */
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* 查询结果样式 */
+        #queryResult {
+            display: none;
+            max-height: 200px;
+            overflow-y: auto; /* 启用纵向滚动 */
+        }
+        #resultTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #resultTable th, #resultTable td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #resultTable th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="dropdown-container" style="display: inline-block; border: none;">
+            <div class="dropdown">
+                <button class="dropbtn" onclick="toggleDropdown('databaseDropdown')">选择数据库</button>
+                <div class="dropdown-content" id="databaseDropdown">
+                    <!-- 数据库选项将动态填充 -->
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn" id="tableButton" style="display: none;"></button> <!-- 用于显示选中的表 -->
+                <div class="dropdown-content" id="tableDropdown" style="display: none;">
+                    <!-- 表选项将动态填充 -->
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; align-items: center; margin-left: 10px;">
+            <button class="button" id="detailsButton" onclick="openDetailsModal()">表详情</button>
+        </div>
+    </header>
+
+    <div class="recommendations" id="recommendations">
+        <div id="recommendation-list">
+            <div class="recommendation-item" data-question="查询病人的信息">查询病人的信息</div>
+            <div class="recommendation-item" data-question="请告诉我病人的病例报告ID、身高、体重、录入时间、录入人ID">请告诉我病人的病例报告ID、身高、体重、录入时间、录入人ID</div>
+            <div class="recommendation-item" data-question="同样的客户有多少交互记录？有多少重要的详情？">同样的客户有多少交互记录？有多少重要的详情？</div>
+            <div class="recommendation-item" data-question="上个月的销售情况如何？">上个月的销售情况如何？</div>
+            <div class="recommendation-item" data-question="下个月的目标是什么？">下个月的目标是什么？</div>
+            <div class="recommendation-item" data-question="客户反馈的主要问题有哪些？">客户反馈的主要问题有哪些？</div>
+        </div>
+    </div>
+
+
+
+
+    <div class="chat-container" id="chatContainer">
+        <div id="chat-message">
+            <!-- 聊天记录将显示在这里 -->
+        </div>
+    </div>
+
+    <div id="queryResult" style="display: none; max-height: 200px; overflow-y: auto;">
+        <table id="resultTable" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <!-- 表头将动态生成 -->
+            </thead>
+            <tbody id="resultBody">
+                <!-- 查询结果将动态填充到这里 -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="input-area">
+        <textarea id="userQuestion" placeholder="请输入您的问题,Enter输出，Shift+Enter换行"></textarea>
+        <button id="askModelButton">
+            <i class="fas fa-paper-plane"></i>  <!-- 发送图标 -->
+        </button>
+    </div>
+</div>
+
+<!-- Modal for Database Details -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeDetails" onclick="closeDetailsModal()">&times;</span>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>字段名</th>
+                        <th>数据类型</th>
+                        <th>注释</th>
+                    </tr>
+                </thead>
+                <tbody id="detailsBody">
+                    <!-- 字段信息将被动态填充 -->
+                </tbody>
+            </table>
+        </div>
+        </div>
+</div>
+
+<script src="api.js"></script>
+
+
+
+
+</body>
+</html>

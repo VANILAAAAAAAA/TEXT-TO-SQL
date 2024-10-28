@@ -1,0 +1,448 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1F2445; /* 外部背景保持淡黄色 */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.container {
+    width: 90%;
+    height: 90%;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 2px solid #333333;
+}
+
+/* 下拉容器样式 */
+.dropdown-container {
+    display: inline-block;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* 下拉菜单按钮样式，保持与“表详情”按钮一致 */
+.dropdown > .dropbtn {
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    background-color: #333333; /* 按钮颜色 */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.dropdown > .dropbtn:hover {
+    background-color: #006666; /* 按钮悬停效果 */
+}
+
+/* 下拉菜单样式改进 */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #ffffff; /* 白色背景 */
+    min-width: 160px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+    border-bottom: 1px solid #e0e0e0; /* 添加分隔线 */
+    z-index: 1;
+    border-radius: 5px;
+    padding: 5px 0;
+}
+
+.dropdown-content a {
+    color: #333;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s;
+    border-bottom: 1px solid #e0e0e0; /* 添加分隔线 */
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1; /* 悬停时背景变亮 */
+}
+
+/* 按钮样式 */
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.button {
+    padding: 10px 15px;
+    background-color: #333333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+.button:hover {
+    background-color: #006666;
+}
+
+/*推荐模块*/
+.recommendations {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    overflow: hidden;
+}
+
+#recommendation-list {
+    display: flex;
+    flex-direction: row;
+}
+
+.recommendation-item {
+    cursor: pointer;
+    padding: 15px 20px;
+    border-radius: 5px;
+    background:#333333;
+    /*background: linear-gradient(135deg, #333333, rgba(0, 204, 204, 0.18));*/
+    color: white;
+    transition: background-color 0.3s, transform 0.3s;
+    min-width: 200px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.recommendation-item:hover {
+    background: linear-gradient(135deg, #333333, rgba(0, 153, 153, 0.29));
+    transform: scale(1.05);
+}
+
+.recommendation-item.selected {
+    color: white;
+    text-decoration: underline;
+}
+
+/*推荐模态框内部组件*/
+/* 表单组样式 */
+.form-group {
+    display: flex; /* 使用flex布局 */
+    align-items: center; /* 垂直居中 */
+    margin-bottom: 15px; /* 每个表单组之间的间距 */
+    flex-wrap: wrap; /* 允许换行 */
+}
+
+
+/* 复选框样式 */
+input[type="checkbox"] {
+    margin-right: 10px; /* 复选框与标签之间的间距 */
+}
+
+/* 下拉菜单样式 */
+select {
+    margin-left: 10px; /* 下拉菜单与复选框之间的间距 */
+    padding: 8px; /* 内边距 */
+    border-radius: 5px; /* 圆角 */
+    border: 1px solid #ccc; /* 边框 */
+    background-color: #f0f0f0; /* 背景颜色 */
+    color: #333; /* 字体颜色 */
+    font-size: 16px; /* 字体大小 */
+}
+
+/* 输入框样式 */
+input[type="text"] {
+    width: 100%; /* 输入框宽度100% */
+    padding: 8px; /* 内边距 */
+    margin-top: 5px; /* 输入框与标签之间的间距 */
+    border: 1px solid #ccc; /* 边框 */
+    border-radius: 4px; /* 圆角 */
+    background-color: #f0f0f0; /* 输入框背景色 */
+    color: #333; /* 字体颜色 */
+}
+
+/* 提交按钮样式 */
+#submit-customization {
+    padding: 10px 15px;
+    background-color: #333333; /* 按钮背景色 */
+    color: white; /* 按钮字体颜色 */
+    border: none; /* 去掉边框 */
+    border-radius: 5px; /* 圆角 */
+    cursor: pointer; /* 鼠标悬停时显示手型 */
+    transition: background-color 0.3s; /* 添加过渡效果 */
+}
+
+#submit-customization:hover {
+    background-color: #006666; /* 悬停时的背景色 */
+}
+
+/* 对话容器样式 */
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.03); /* 纯白色背景 */
+    transition: height 0.3s;
+}
+
+/* 输入框样式 */
+.input-area {
+    display: flex;
+    align-items: flex-end; /* 底部对齐 */
+    justify-content: center; /* 水平居中对齐 */
+    padding: 10px 0;
+    border-top: 2px solid #008080;
+    background-color: #ffffff;
+}
+
+.input-area textarea {
+    width: 100%;
+    height: 28px; /* 设置与按钮相同的高度 */
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px; /* 右侧间距 */
+    resize: none;
+    font-size: 16px;
+    background-color: #f0f0f0;
+}
+
+.input-area button {
+    height: 50px; /* 设置按钮高度 */
+    padding: 10px 20px;
+    background-color: #333333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+.input-area button:hover {
+    background-color: #006666;
+}
+
+/*模态框样式*/
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+/* 模态框样式 */
+#customize-modal {
+    display: none; /* 默认隐藏模态框 */
+    position: fixed;
+    z-index: 1000; /* 确保模态框在最上层 */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+    justify-content: center; /* 垂直居中 */
+    align-items: center; /* 水平居中 */
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* 增加模态框阴影 */
+    width: 90%;
+    max-width: 1000px;
+    height: auto;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative; /* 允许绝对定位的子元素 */
+}
+
+.modal-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.modal-content p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.modal-content .btn {
+    background-color: #008080;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal-content .btn:hover {
+    background-color: #006666;
+}
+
+
+#customize-modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+input[type="date"],
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 按钮样式 */
+.button {
+    background-color: #333333;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.button:hover {
+    background-color: #006666;
+}
+
+/* 按钮组样式 */
+.button-group {
+    display: flex;
+    justify-content: start; /* 水平左对齐 */
+    align-items: center;
+}
+
+table {
+    width: 95%;
+    border-collapse: collapse;
+    margin: auto;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    top: 10px; /* 距离顶部10px */
+    right: 15px; /* 距离右侧15px */
+    position: absolute;
+    font-size: 28px;
+    font-weight: bold;
+    z-index: 1001;
+}
+
+/* 关闭按钮样式 */
+.close-btn {
+    color: #aaa; /* 关闭按钮颜色 */
+    float: right; /* 右侧对齐 */
+    font-size: 28px; /* 字体大小 */
+    font-weight: bold; /* 加粗 */
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/*执行结果*/
+#queryResult {
+    display: none;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#resultTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#resultTable th, #resultTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#resultTable th {
+    background-color: #f2f2f2;
+}
+/*结果缩小*/
+.output-text.shrinked {
+    max-height: 50px;
+    overflow: auto;
+    text-overflow: ellipsis;
+}
+
+/*加载*/
+.loading-bubble {
+    position: fixed; /* 固定在页面中间 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 居中对齐 */
+    background-color: rgba(255, 255, 255, 0.9); /* 气泡背景色 */
+    border-radius: 10px; /* 圆角气泡 */
+    padding: 20px; /* 内边距 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+    z-index: 1000; /* 确保在最上层 */
+}

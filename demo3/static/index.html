@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chatbi对话助手</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css"> <!-- 引入 CSS 文件 -->
+</head>
+<body>
+
+
+<!-- 选择数据库和表的菜单 -->
+<div class="container">
+    <header>
+        <div class="dropdown-container" style="display: inline-block; border: none;">
+            <div class="dropdown">
+                <button class="dropbtn" onclick="toggleDropdown('databaseDropdown')">选择数据库</button>
+                <div class="dropdown-content" id="databaseDropdown">
+                    <!-- 数据库选项将动态填充 -->
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn" id="tableButton" style="display: none;"></button> <!-- 用于显示选中的表 -->
+                <div class="dropdown-content" id="tableDropdown" style="display: none;">
+                    <!-- 表选项将动态填充 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加触发CSV上传模态框的按钮 -->
+        <button class="button" onclick="openCsvModal()">上传 CSV 文件</button>
+
+        <div style="display: flex; align-items: center; margin-left: 10px;">
+            <button class="button" id="detailsButton" onclick="openDetailsModal()">表详情</button>
+        </div>
+    </header>
+
+
+    <div class="recommendations" id="recommendations">
+        <div id="recommendation-list">
+            <div class="recommendation-item" data-question="查询审核标志为‘已终审卡’，且地区类别不是‘外籍’或是‘港澳台’，且现住址编码范围是4401000-44019999，且病例类型是‘确诊病例’或‘临床病例’，">
+                当年新报告Hiv筛选规则
+            </div>
+            <div class="recommendation-item" data-question="查询审核标志为‘已终审卡’，且地区类别不是‘外籍’或是‘港澳台’，且现住址编码范围是4401000-44019999，且病例类型是‘确诊病例’或‘临床病例’">
+                当年新报告Aids筛选规则
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- 模型输出 -->
+    <div class="chat-container" id="chatContainer">
+        <div id="chat-message">
+            <!-- 聊天记录将显示在这里 -->
+        </div>
+    </div>
+<!--    <div id="loadingBubble" class="loading-bubble" style="display: none;">-->
+<!--        <div class="loader"></div>-->
+<!--    </div>-->
+
+
+    <!-- 模型输出 -->
+    <div id="queryResult" style="display: none; max-height: 200px; overflow-y: auto;">
+        <table id="resultTable" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <!-- 表头将动态生成 -->
+            </thead>
+            <tbody id="resultBody">
+                <!-- 查询结果将动态填充到这里 -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 输入框 -->
+    <div class="input-area">
+        <textarea id="userQuestion" placeholder="请输入您的问题,Enter输出，Shift+Enter换行"></textarea>
+        <button id="askModelButton">
+            <i class="fas fa-paper-plane"></i>  <!-- 发送图标 -->
+        </button>
+    </div>
+</div>
+
+<!-- 推荐信息自定义模态框 -->
+<div id="customize-modal" style="display: none;" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <div class="form-group">
+
+            <label>
+                <input type="checkbox" id="select-year"> 选择年份
+            </label>
+            <select id="year-input" style="display: none;">
+                <!-- 这里填充年份选项 -->
+            </select>
+        </div>
+
+         <div class="form-group">
+            <label>
+                <input type="checkbox" id="select-month"> 选择月份
+            </label>
+            <select id="month-input" style="display: none;">
+                <option value="01">1月</option>
+                <option value="02">2月</option>
+                <option value="03">3月</option>
+                <option value="04">4月</option>
+                <option value="05">5月</option>
+                <option value="06">6月</option>
+                <option value="07">7月</option>
+                <option value="08">8月</option>
+                <option value="09">9月</option>
+                <option value="10">10月</option>
+                <option value="11">11月</option>
+                <option value="12">12月</option>
+            </select>
+         </div>
+
+        <label for="disease-input">疾病名称:</label>
+        <input type="text" id="disease-input">
+        <button id="submit-customization">提交</button>
+    </div>
+</div>
+
+<!-- CSV上传模态框 -->
+<div id="csvModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeCsvModal()">&times;</span>
+        <h2>上传 CSV 文件</h2>
+        <label for="fileInput">选择 CSV 文件:</label>
+        <input type="file" id="fileInput" accept=".csv">
+
+        <br><br>
+
+        <label for="encodingSelect">选择编码:</label>
+        <select id="encodingSelect">
+            <option value="utf-8">UTF-8</option>
+            <option value="gbk">GBK</option>
+        </select>
+
+        <br><br>
+
+        <button id="uploadButton">上传 CSV</button>
+    </div>
+</div>
+
+
+
+<!-- 表详情的模态框 -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeDetails" onclick="closeDetailsModal()">&times;</span>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>字段名</th>
+                        <th>数据类型</th>
+                        <th>注释</th>
+                    </tr>
+                </thead>
+                <tbody id="detailsBody">
+                    <!-- 字段信息将被动态填充 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--<脚本>-->
+<script src="api.js"></script>
+
+
+</body>
+</html>

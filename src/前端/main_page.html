@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择数据库</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e9ecef;
+            height: 100vh; /* 使页面占满整个高度 */
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            flex: 1; /* 使容器占满剩余空间 */
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 2px solid #007bff;
+        }
+        .database-select {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+        }
+        .database-select label {
+            margin-right: 10px;
+        }
+        .database-select select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .recommendations {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .recommendation-card {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            flex: 1 1 200px;
+            min-width: 200px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            background-color: #0056b3;
+        }
+        .suggestions {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f1f8e9;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .suggestions h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        .input-area {
+            margin-top: auto; /* 将输入区域推到底部 */
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-top: 2px solid #007bff;
+        }
+        .input-area textarea {
+            width: 100%;
+            height: 60px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            resize: none; /* 禁止调整大小 */
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .input-area button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 16px;
+        }
+        .input-area button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.7); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 10px;
+            width: 90%; /* Could be more or less, depending on screen size */
+            max-width: 800px; /* Maximum width */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="database-select">
+            <label for="database">数据库选择:</label>
+            <select id="database">
+                <option value="yuyitech_public">yuyitech_public</option>
+                <option value="another_database">另一个数据库</option>
+            </select>
+        </div>
+        <div class="button-group">
+            <button class="button" id="detailsButton">数据库详情</button>
+            <button class="button" id="historyButton">查看历史</button>
+        </div>
+    </header>
+
+    <div class="recommendations">
+        <div class="recommendation-card">新建的统计图表数量有多少？</div>
+        <div class="recommendation-card">2024年新年度计划</div>
+        <div class="recommendation-card">统计2023年新开的门店数量</div>
+        <div class="recommendation-card">同样的信息在多少？需要再查看管理</div>
+    </div>
+
+    <div class="suggestions">
+        <h3>推荐问题:</h3>
+        <p>本周的信息统计有多少？需要哪些重要指标？</p>
+        <p>今天有多少新客户？有多少重要客户？</p>
+        <p>同样的客户有多少交互记录？有多少重要的详情？</p>
+    </div>
+
+    <div class="input-area">
+        <textarea placeholder="请输入您的问题..."></textarea>
+        <button>发送</button>
+    </div>
+</div>
+
+<!-- Modal for Database Details -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeDetails">&times;</span>
+        <h2>数据库详情</h2>
+        <p>这里将显示数据库的详细信息...</p>
+    </div>
+</div>
+
+<!-- Modal for History -->
+<div id="historyModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeHistory">&times;</span>
+        <h2>历史记录</h2>
+        <p>这里将显示用户的历史输入...</p>
+    </div>
+</div>
+
+<script>
+    // Get the modal elements
+    var detailsModal = document.getElementById("detailsModal");
+    var historyModal = document.getElementById("historyModal");
+
+    // Get the button elements
+    var detailsButton = document.getElementById("detailsButton");
+    var historyButton = document.getElementById("historyButton");
+
+    // Get the <span> elements that close the modal
+    var closeDetails = document.getElementById("closeDetails");
+    var closeHistory = document.getElementById("closeHistory");
+
+    // When the user clicks on the button, open the modal
+    detailsButton.onclick = function() {
+        detailsModal.style.display = "flex"; // Show the modal
+    }
+    historyButton.onclick = function() {
+        historyModal.style.display = "flex"; // Show the modal
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    closeDetails.onclick = function() {
+        detailsModal.style.display = "none"; // Hide the modal
+    }
+    closeHistory.onclick = function() {
+        historyModal.style.display = "none"; // Hide the modal
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == detailsModal) {
+            detailsModal.style.display = "none";
+        }
+        if (event.target == historyModal) {
+            historyModal.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>
